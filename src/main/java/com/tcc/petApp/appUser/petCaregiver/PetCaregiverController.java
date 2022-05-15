@@ -4,12 +4,7 @@ import com.tcc.petApp.appUser.petCaregiver.api.PetCaregiverRequest;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.spripackage com.tcc.petApp.appUser.petCaregiver;
-
-public class PetCaregiverController {
-    
-}
-ngframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
