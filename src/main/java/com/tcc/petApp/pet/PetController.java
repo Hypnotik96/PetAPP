@@ -1,5 +1,7 @@
 package com.tcc.petApp.pet;
 
+import com.tcc.petApp.appUser.petOwner.PetOwner;
+import com.tcc.petApp.appUser.petOwner.PetOwnerService;
 import com.tcc.petApp.pet.api.PetRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,9 @@ public class PetController {
 
     @Autowired
     PetMapper petMapper;
+
+    @Autowired
+    PetOwnerService petOwnerService;
 
     //PET LIST
     @GetMapping
@@ -42,15 +47,18 @@ public class PetController {
         Optional<Pet> pet = petService.findPetById(id);
 
         return pet.map(value -> new ResponseEntity<PetRequest>(petMapper.petToPetRequest(value), HttpStatus.OK))
-                  .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
     public ResponseEntity<PetRequest> savePet(@RequestBody PetRequest petRequest) {
-
         Pet pet = petMapper.petRequestToPet(petRequest);
         petService.savePet(pet);
-
+        PetOwner petOwner = petOwnerService.findPetOwnerById(petRequest.getPetOwnerId()).get();
+        List<Long> petIds = petOwner.getPetIds();
+        petIds.add(pet.getId());
+        petOwner.setPetIds(petIds);
+        petOwnerService.updatePetOwner(petOwner);
         return new ResponseEntity<PetRequest>(petRequest, HttpStatus.OK);
     }
 
@@ -64,7 +72,7 @@ public class PetController {
                                 petService.savePet(
                                         petMapper.updateSetterPet(pet, petRequest))),
                                 HttpStatus.ACCEPTED))
-                          .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
